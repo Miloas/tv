@@ -2,6 +2,7 @@ package tv
 
 import (
 	"testing"
+
 	"github.com/blang/semver"
 )
 
@@ -45,8 +46,11 @@ func TestMajor(t *testing.T) {
 	}).String() {
 		t.Error("Major get a wrong result")
 	}
-}
 
+	if ver.GetTagStr("tv") != "2.0.0+tv" {
+		t.Error("get wrong tag str result")
+	}
+}
 
 func TestMinor(t *testing.T) {
 	ver, _ := Make("1.2.3")
@@ -63,6 +67,10 @@ func TestMinor(t *testing.T) {
 		[]string{},
 	}).String() {
 		t.Error("Minor get a wrong result")
+	}
+
+	if ver.GetTagStr("tv") != "1.3.0+tv" {
+		t.Error("get wrong tag str result")
 	}
 }
 
@@ -82,6 +90,10 @@ func TestPatch(t *testing.T) {
 	}).String() {
 		t.Error("Patch get a wrong result")
 	}
+
+	if ver.GetTagStr("tv") != "1.2.4+tv" {
+		t.Error("get wrong tag str result")
+	}
 }
 
 func TestPrerelease(t *testing.T) {
@@ -99,5 +111,9 @@ func TestPrerelease(t *testing.T) {
 		[]string{},
 	}).String() {
 		t.Error("Prerelease get a wrong result")
+	}
+
+	if ver.GetTagStr("tv") != "1.2.3-alpha.2+tv" {
+		t.Error("get wrong tag str result")
 	}
 }
