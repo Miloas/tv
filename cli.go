@@ -9,23 +9,24 @@ import (
 	"reflect"
 	tv "tv/lib"
 
+	"github.com/iancoleman/orderedmap"
 	"github.com/urfave/cli"
 )
 
-var versionInfos map[string]string
+var versionInfos *orderedmap.OrderedMap
 
-func readVersionFile(path string) (map[string]string, error) {
+func readVersionFile(path string) (*orderedmap.OrderedMap, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	var m map[string]string
-	err = json.Unmarshal(buf, &m)
-	return m, err
+	o := orderedmap.New()
+	err = json.Unmarshal(buf, &o)
+	return o, err
 }
 
-func writeVersionFile(m map[string]string, path string) error {
-	buf, err := json.MarshalIndent(&m, "", "  ")
+func writeVersionFile(o *orderedmap.OrderedMap, path string) error {
+	buf, err := json.MarshalIndent(&o, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -42,13 +43,13 @@ func doAction(c *cli.Context, action string) error {
 		return fmt.Errorf("workspace not clean")
 	}
 	build := c.String("build")
-	if version, ok := versionInfos[build]; ok {
-		v, err := tv.Make(version)
+	if version, ok := versionInfos.Get(build); ok {
+		v, err := tv.Make(version.(string))
 		if err != nil {
 			return err
 		}
 		reflect.ValueOf(v).MethodByName(action).Call([]reflect.Value{})
-		versionInfos[build] = v.GetVersion()
+		versionInfos.Set(build, v.GetVersion())
 		err = writeVersionFile(versionInfos, tv.SemverFilePath)
 		if err != nil {
 			return err
