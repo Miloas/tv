@@ -15,6 +15,13 @@ import (
 
 var versionInfos *orderedmap.OrderedMap
 
+func getfirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
+	for _, k := range o.Keys() {
+		return k
+	}
+	return ""
+}
+
 func readVersionFile(path string) (*orderedmap.OrderedMap, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -43,6 +50,9 @@ func doAction(c *cli.Context, action string) error {
 		return fmt.Errorf("workspace not clean")
 	}
 	build := c.String("build")
+	if build == "" {
+		build = getfirstKeyFromOrderedMap(versionInfos)
+	}
 	if version, ok := versionInfos.Get(build); ok {
 		v, err := tv.Make(version.(string))
 		if err != nil {
