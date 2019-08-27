@@ -19,7 +19,7 @@ func TagVersion(tag string) error {
 	if err != nil {
 		return err
 	}
-	err = exec.Command("git", "add", "semver.json").Run()
+	err = exec.Command("git", "add", SemverFileName).Run()
 	if err != nil {
 		return err
 	}

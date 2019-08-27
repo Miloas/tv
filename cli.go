@@ -34,7 +34,7 @@ func writeVersionFile(m map[string]string, path string) error {
 }
 
 func init() {
-	versionInfos, _ = readVersionFile("./semver.json")
+	versionInfos, _ = readVersionFile(tv.SemverFilePath)
 }
 
 func doAction(c *cli.Context, action string) error {
@@ -49,7 +49,7 @@ func doAction(c *cli.Context, action string) error {
 		}
 		reflect.ValueOf(v).MethodByName(action).Call([]reflect.Value{})
 		versionInfos[build] = v.GetVersion()
-		err = writeVersionFile(versionInfos, "./semver.json")
+		err = writeVersionFile(versionInfos, tv.SemverFilePath)
 		if err != nil {
 			return err
 		}

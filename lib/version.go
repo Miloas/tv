@@ -6,6 +6,9 @@ import (
 	"github.com/blang/semver"
 )
 
+const SemverFileName = "semver.json"
+const SemverFilePath = "./" + SemverFileName
+
 type Version struct {
 	v *semver.Version
 }
