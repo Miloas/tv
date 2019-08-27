@@ -15,5 +15,13 @@ func IsClean() bool {
 
 func TagVersion(tag string) error {
 	commitMessage, _ := strconv.Unquote("\"" + tag + "\"")
-	return exec.Command("git", "tag", "-am", commitMessage, tag).Run()
+	err := exec.Command("git", "tag", "-am", commitMessage, tag).Run()
+	if err != nil {
+		return err
+	}
+	err = exec.Command("git", "add", "semver.json").Run()
+	if err != nil {
+		return err
+	}
+	return exec.Command("git", "commit", "-m", commitMessage).Run()
 }
