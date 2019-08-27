@@ -2,6 +2,7 @@ package tv
 
 import (
 	"fmt"
+
 	"github.com/blang/semver"
 )
 
@@ -14,7 +15,7 @@ func Make(vStr string) (*Version, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Version {
+	return &Version{
 		v: &v,
 	}, nil
 }
@@ -57,5 +58,9 @@ func (v *Version) Prerelease() error {
 
 func (v *Version) GetTagStr(build string) string {
 	v.v.Build = []string{build}
+	return v.v.String()
+}
+
+func (v *Version) GetVersion() string {
 	return v.v.String()
 }

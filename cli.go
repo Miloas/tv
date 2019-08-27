@@ -21,7 +21,16 @@ func readVersionFile(path string) (map[string]string, error) {
 	}
 	var m map[string]string
 	err = json.Unmarshal(buf, &m)
-	return m, nil
+	return m, err
+}
+
+func writeVersionFile(m map[string]string, path string) error {
+	buf, err := json.MarshalIndent(&m, "", "  ")
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(path, buf, 0644)
+	return err
 }
 
 func init() {
@@ -29,14 +38,25 @@ func init() {
 }
 
 func doAction(c *cli.Context, action string) error {
+	if !tv.IsClean() {
+		return fmt.Errorf("workspace not clean")
+	}
 	build := c.String("build")
 	if version, ok := versionInfos[build]; ok {
 		v, err := tv.Make(version)
 		if err != nil {
 			return err
 		}
-		reflect.ValueOf(&v).MethodByName(action).Call([]reflect.Value{})
-		fmt.Println(v.GetTagStr(build))
+		reflect.ValueOf(v).MethodByName(action).Call([]reflect.Value{})
+		versionInfos[build] = v.GetVersion()
+		err = writeVersionFile(versionInfos, "./semver.json")
+		if err != nil {
+			return err
+		}
+		err = tv.TagVersion(v.GetTagStr(build))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
