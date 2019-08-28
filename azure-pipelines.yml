@@ -63,7 +63,7 @@ jobs:
 
 - job: release
   dependsOn: perOS
-  condition: eq(variables['Build.SourceBranchName'], 'master')
+  condition: and(eq(variables['Build.SourceBranchName'], 'master'), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   steps:
   - task: DownloadBuildArtifacts@0
     inputs:
