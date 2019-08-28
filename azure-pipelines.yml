@@ -82,6 +82,6 @@ jobs:
   - task: GitHubRelease@0
     inputs:
       gitHubConnection: tv
-      action: edit
+      action: create
       repositoryName: '$(Build.Repository.Name)'
       assets: '$(Build.ArtifactStagingDirectory)/**/*'

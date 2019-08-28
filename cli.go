@@ -64,9 +64,9 @@ func doAction(c *cli.Context, action string) error {
 		if err != nil {
 			return err
 		}
-		tag := v.GetTagStr(build)
-		if c.Bool("clear") {
-			tag = v.GetVersion()
+		tag := v.GetVersion()
+		if !c.Bool("clear") {
+			tag = v.GetTagStr(build)
 		}
 		err = tv.TagVersion(tag)
 		if err != nil {
@@ -80,7 +80,6 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tv"
 	app.Usage = "tag version for ur f** awesome project"
-	app.Version = "1.0.5"
 	flags := []cli.Flag{
 		cli.StringFlag{Name: "build, b"},
 		cli.BoolFlag{Name: "clear, c"},
