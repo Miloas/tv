@@ -1,6 +1,5 @@
 variables:
   GOBIN: '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.12' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
   GO111MODULE: 'on'
@@ -10,18 +9,14 @@ jobs:
   displayName: Build
   strategy:
     matrix:
-      windows:
-        os: vs2017-win2016
-        osname: windows
-        bin: tv.exe
       linux:
         os: 'ubuntu-16.04'
         osname: linux
-        bin: tv
+        bin: tv_linux_amd64
       osx:
         os: macOS-10.14
         osname: osx
-        bin: tv
+        bin: tv_darwin_amd64
   pool:
     vmImage: $(os)
   steps:
@@ -33,7 +28,6 @@ jobs:
         shopt -s dotglob
         mv !(gopath) '$(modulePath)'
         echo '##vso[task.prependpath]$(GOBIN)'
-        echo '##vso[task.prependpath]$(GOROOT)/bin'
         go version
       displayName: Set up Go workspace
 
@@ -58,14 +52,14 @@ jobs:
       displayName: Test
 
     - script: |
-        go build -o bin/$bin .
+        go build -o bin/$(bin) .
       workingDirectory: '$(modulePath)'
       displayName: Build Bin
 
     - task: PublishBuildArtifacts@1
       condition: eq(variables['Build.SourceBranchName'], 'master')
       inputs:
-        pathtoPublish: 'bin/$(bin)'
+        pathtoPublish: '$(modulePath)/bin/$(bin)'
         artifactName: $(osname)
 
 - job: release
@@ -85,15 +79,9 @@ jobs:
       downloadType: 'single'
       artifactName: osx
       downloadPath: '$(Build.ArtifactStagingDirectory)/osx'
-  - task: DownloadBuildArtifacts@0
-    inputs:
-      buildType: 'current'
-      downloadType: 'single'
-      artifactName: windows
-      downloadPath: '$(Build.ArtifactStagingDirectory)/windows'
   - task: GitHubRelease@0
     inputs:
       gitHubConnection: tv
-      action: create
+      action: edit
       repositoryName: '$(Build.Repository.Name)'
-      assets: "$(Build.ArtifactStagingDirectory)/**/*"
+      assets: '$(Build.ArtifactStagingDirectory)/**/*'
