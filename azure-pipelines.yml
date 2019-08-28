@@ -36,7 +36,6 @@ jobs:
       displayName: Install linter
 
     - script: |
-        scripts/build clean
         go mod download
       workingDirectory: '$(modulePath)'
       displayName: Get Go dependencies
@@ -66,7 +65,6 @@ jobs:
   dependsOn: perOS
   condition: eq(variables['Build.SourceBranchName'], 'master')
   steps:
-  - checkout: none
   - task: DownloadBuildArtifacts@0
     inputs:
       buildType: 'current'
@@ -79,9 +77,17 @@ jobs:
       downloadType: 'single'
       artifactName: osx
       downloadPath: '$(Build.ArtifactStagingDirectory)/osx'
+  - bash: |
+      export GITHUB_TAG=`cat semver.json | sed -n 's|.*"tv": "\([^"]*\)".*|\1|p'`
+      echo "##vso[task.setvariable variable=GITHUB_TAG;]${GITHUB_TAG}"
   - task: GitHubRelease@0
     inputs:
       gitHubConnection: tv
-      action: create
+      action: edit
+      tagSource: 'manual'
+      tag: '$(GITHUB_TAG)'
+      title: 'v$(GITHUB_TAG)'
       repositoryName: '$(Build.Repository.Name)'
       assets: '$(Build.ArtifactStagingDirectory)/**/*'
+      addChangeLog: false
+
