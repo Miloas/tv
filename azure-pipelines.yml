@@ -1,0 +1,42 @@
+pool:
+  vmImage: "Ubuntu-16.04"
+
+variables:
+  GOBIN: "$(GOPATH)/bin" # Go binaries path
+  GOROOT: "/usr/local/go1.12" # Go installation path
+  GOPATH: "$(system.defaultWorkingDirectory)/gopath" # Go workspace path
+  modulePath: "$(GOPATH)/src/github.com/$(build.repository.name)" # Path to the module's code
+  GO111MODULE: "on"
+
+steps:
+  - script: |
+      mkdir -p '$(GOBIN)'
+      mkdir -p '$(GOPATH)/pkg'
+      mkdir -p '$(modulePath)'
+      shopt -s extglob
+      shopt -s dotglob
+      mv !(gopath) '$(modulePath)'
+      echo '##vso[task.prependpath]$(GOBIN)'
+      echo '##vso[task.prependpath]$(GOROOT)/bin'
+      go version
+    displayName: "Set up Go workspace"
+
+  - script: |
+      curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
+    displayName: Install linter
+
+  - script: |
+      scripts/build clean
+      go mod download
+    workingDirectory: "$(modulePath)"
+    displayName: "Get Go dependencies"
+
+  - script: |
+      golangci-lint run
+    workingDirectory: "$(modulePath)"
+    displayName: "Lint"
+
+  - script: |
+      go test -v -race ./...
+    workingDirectory: "$(modulePath)"
+    displayName: "Test"
