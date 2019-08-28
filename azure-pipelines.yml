@@ -1,42 +1,99 @@
-pool:
-  vmImage: "Ubuntu-16.04"
-
 variables:
-  GOBIN: "$(GOPATH)/bin" # Go binaries path
-  GOROOT: "/usr/local/go1.12" # Go installation path
-  GOPATH: "$(system.defaultWorkingDirectory)/gopath" # Go workspace path
-  modulePath: "$(GOPATH)/src/github.com/$(build.repository.name)" # Path to the module's code
-  GO111MODULE: "on"
+  GOBIN: '$(GOPATH)/bin' # Go binaries path
+  GOROOT: '/usr/local/go1.12' # Go installation path
+  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
+  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
+  GO111MODULE: 'on'
 
-steps:
-  - script: |
-      mkdir -p '$(GOBIN)'
-      mkdir -p '$(GOPATH)/pkg'
-      mkdir -p '$(modulePath)'
-      shopt -s extglob
-      shopt -s dotglob
-      mv !(gopath) '$(modulePath)'
-      echo '##vso[task.prependpath]$(GOBIN)'
-      echo '##vso[task.prependpath]$(GOROOT)/bin'
-      go version
-    displayName: "Set up Go workspace"
+jobs:
+- job: perOS
+  displayName: Build
+  strategy:
+    matrix:
+      windows:
+        os: vs2017-win2016
+        osname: windows
+        bin: tv.exe
+      linux:
+        os: 'ubuntu-16.04'
+        osname: linux
+        bin: tv
+      osx:
+        os: macOS-10.14
+        osname: osx
+        bin: tv
+  pool:
+    vmImage: $(os)
+  steps:
+    - script: |
+        mkdir -p '$(GOBIN)'
+        mkdir -p '$(GOPATH)/pkg'
+        mkdir -p '$(modulePath)'
+        shopt -s extglob
+        shopt -s dotglob
+        mv !(gopath) '$(modulePath)'
+        echo '##vso[task.prependpath]$(GOBIN)'
+        echo '##vso[task.prependpath]$(GOROOT)/bin'
+        go version
+      displayName: Set up Go workspace
 
-  - script: |
-      curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
-    displayName: Install linter
+    - script: |
+        curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
+      displayName: Install linter
 
-  - script: |
-      scripts/build clean
-      go mod download
-    workingDirectory: "$(modulePath)"
-    displayName: "Get Go dependencies"
+    - script: |
+        scripts/build clean
+        go mod download
+      workingDirectory: '$(modulePath)'
+      displayName: Get Go dependencies
 
-  - script: |
-      golangci-lint run
-    workingDirectory: "$(modulePath)"
-    displayName: "Lint"
+    - script: |
+        golangci-lint run
+      workingDirectory: '$(modulePath)'
+      displayName: Lint
 
-  - script: |
-      go test -v -race ./...
-    workingDirectory: "$(modulePath)"
-    displayName: "Test"
+    - script: |
+        go test -v -race ./...
+      workingDirectory: '$(modulePath)'
+      displayName: Test
+
+    - script: |
+        go build -o bin/$bin .
+      workingDirectory: '$(modulePath)'
+      displayName: Build Bin
+
+    - task: PublishBuildArtifacts@1
+      condition: eq(variables['Build.SourceBranchName'], 'master')
+      inputs:
+        pathtoPublish: 'bin/$(bin)'
+        artifactName: $(osname)
+
+- job: release
+  dependsOn: perOS
+  condition: eq(variables['Build.SourceBranchName'], 'master')
+  steps:
+  - checkout: none
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'single'
+      artifactName: linux
+      downloadPath: '$(Build.ArtifactStagingDirectory)/linux'
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'single'
+      artifactName: osx
+      downloadPath: '$(Build.ArtifactStagingDirectory)/osx'
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'single'
+      artifactName: windows
+      downloadPath: '$(Build.ArtifactStagingDirectory)/windows'
+  - task: GitHubRelease@0
+    inputs:
+      gitHubConnection: tv
+      action: create
+      repositoryName: '$(Build.Repository.Name)'
+      assets: "$(Build.ArtifactStagingDirectory)/**/*"
