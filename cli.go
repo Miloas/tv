@@ -64,7 +64,11 @@ func doAction(c *cli.Context, action string) error {
 		if err != nil {
 			return err
 		}
-		err = tv.TagVersion(v.GetTagStr(build))
+		tag := v.GetTagStr(build)
+		if c.Bool("clear") {
+			tag = v.GetVersion()
+		}
+		err = tv.TagVersion(tag)
 		if err != nil {
 			return err
 		}
@@ -79,6 +83,7 @@ func main() {
 	app.Version = "1.0.5"
 	flags := []cli.Flag{
 		cli.StringFlag{Name: "build, b"},
+		cli.BoolFlag{Name: "clear, c"},
 	}
 	app.Commands = []cli.Command{
 		{
