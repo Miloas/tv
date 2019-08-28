@@ -76,6 +76,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tv"
 	app.Usage = "tag version for ur f** awesome project"
+	app.Version = "1.0.5"
 	flags := []cli.Flag{
 		cli.StringFlag{Name: "build, b"},
 	}
