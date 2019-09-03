@@ -19,7 +19,7 @@ func TagVersion(tag string) error {
 	if err != nil {
 		return err
 	}
-	err = exec.Command("git", "commit", "-m", commitMessage).Run()
+	err = exec.Command("git", "commit", "-m", commitMessage, "-n").Run()
 	if err != nil {
 		return err
 	}
