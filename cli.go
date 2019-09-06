@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -46,9 +45,6 @@ func init() {
 }
 
 func doAction(c *cli.Context, action string) error {
-	if !tv.IsClean() {
-		return fmt.Errorf("workspace not clean")
-	}
 	build := c.String("build")
 	if build == "" {
 		build = getfirstKeyFromOrderedMap(versionInfos)
