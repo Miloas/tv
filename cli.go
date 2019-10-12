@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
-	"fmt"
 	tv "tv/lib"
 
 	"github.com/iancoleman/orderedmap"
