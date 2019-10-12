@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -45,6 +46,9 @@ func init() {
 }
 
 func doAction(c *cli.Context, action string) error {
+	if c.Bool("dry-run") {
+		fmt.Println("Start dry-run...")
+	}
 	build := c.String("build")
 	if build == "" {
 		build = getfirstKeyFromOrderedMap(versionInfos)
@@ -56,13 +60,17 @@ func doAction(c *cli.Context, action string) error {
 		}
 		reflect.ValueOf(v).MethodByName(action).Call([]reflect.Value{})
 		versionInfos.Set(build, v.GetVersion())
-		err = writeVersionFile(versionInfos, tv.SemverFilePath)
-		if err != nil {
-			return err
-		}
 		tag := v.GetVersion()
 		if !c.Bool("clear") {
 			tag = v.GetTagStr(build)
+		}
+		fmt.Println("Generating git tag:", tag)
+		if c.Bool("dry-run") {
+			return nil
+		}
+		err = writeVersionFile(versionInfos, tv.SemverFilePath)
+		if err != nil {
+			return err
 		}
 		err = tv.TagVersion(tag)
 		if err != nil {
@@ -79,6 +87,7 @@ func main() {
 	flags := []cli.Flag{
 		cli.StringFlag{Name: "build, b"},
 		cli.BoolFlag{Name: "clear, c"},
+		cli.BoolFlag{Name: "dry-run"},
 	}
 	app.Commands = []cli.Command{
 		{
