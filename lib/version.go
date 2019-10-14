@@ -23,6 +23,14 @@ func Make(vStr string) (*Version, error) {
 	}, nil
 }
 
+func (v *Version) SpecificVersion(vStr string) error {
+	ver, err := semver.Make(vStr)
+	if err != nil {
+		v.v = &ver
+	}
+	return err
+}
+
 func (v *Version) Major() error {
 	err := v.v.IncrementMajor()
 	v.v.Pre = nil
