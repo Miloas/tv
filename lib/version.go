@@ -1,9 +1,11 @@
 package tv
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/blang/semver"
+	"github.com/urfave/cli"
 )
 
 const SemverFileName = "semver.json"
@@ -23,35 +25,58 @@ func Make(vStr string) (*Version, error) {
 	}, nil
 }
 
-func (v *Version) SpecificVersion(vStr string) error {
-	ver, err := semver.Make(vStr)
+func (v *Version) SpecificVersion(args cli.Args) error {
+	if len(args) != 1 {
+		return errors.New("unacceptable arguments for specific version")
+	}
+	ver, err := semver.Make(args[0])
 	if err != nil {
 		v.v = &ver
 	}
 	return err
 }
 
-func (v *Version) Major() error {
-	err := v.v.IncrementMajor()
+func (v *Version) Major(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
+	err = v.v.IncrementMajor()
 	v.v.Pre = nil
 	return err
 }
 
-func (v *Version) Minor() error {
-	err := v.v.IncrementMinor()
+func (v *Version) Minor(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
+	err = v.v.IncrementMinor()
 	v.v.Pre = nil
 	return err
 }
 
-func (v *Version) Patch() error {
-	err := v.v.IncrementPatch()
+func (v *Version) Patch(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
+	err = v.v.IncrementPatch()
 	v.v.Pre = nil
 	return err
 }
 
-func (v *Version) Prerelease() error {
+func (v *Version) Prerelease(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
 	preVersions := v.v.Pre
-	err := fmt.Errorf("Prerelease version can not be incremented for %q", v.v.String())
+	err = fmt.Errorf("Prerelease version can not be incremented for %q", v.v.String())
 
 	if len(preVersions) != 2 {
 		return err
@@ -74,4 +99,11 @@ func (v *Version) GetTagStr(build string) string {
 
 func (v *Version) GetVersion() string {
 	return v.v.String()
+}
+
+func checkArgsEmpty(args cli.Args) error {
+	if len(args) > 0 {
+		return fmt.Errorf("too many arguments")
+	}
+	return nil
 }
