@@ -32,7 +32,7 @@ func TestMake(t *testing.T) {
 
 func TestMajor(t *testing.T) {
 	ver, _ := Make("1.2.3")
-	err := ver.Major()
+	err := ver.Major([]string{})
 	if err != nil {
 		t.Error("Do Major error")
 	}
@@ -54,7 +54,7 @@ func TestMajor(t *testing.T) {
 
 func TestMinor(t *testing.T) {
 	ver, _ := Make("1.2.3")
-	err := ver.Minor()
+	err := ver.Minor([]string{})
 	if err != nil {
 		t.Error("Do Minor error")
 	}
@@ -76,7 +76,7 @@ func TestMinor(t *testing.T) {
 
 func TestPatch(t *testing.T) {
 	ver, _ := Make("1.2.3")
-	err := ver.Patch()
+	err := ver.Patch([]string{})
 	if err != nil {
 		t.Error("Do Patch error")
 	}
@@ -98,7 +98,7 @@ func TestPatch(t *testing.T) {
 
 func TestPrerelease(t *testing.T) {
 	ver, _ := Make("1.2.3-alpha.1")
-	err := ver.Prerelease()
+	err := ver.Prerelease([]string{})
 	if err != nil {
 		t.Error("Do Prerelease error")
 	}
