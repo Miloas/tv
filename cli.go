@@ -19,6 +19,7 @@ func getfirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
 	for _, k := range o.Keys() {
 		return k
 	}
+
 	return ""
 }
 
@@ -27,8 +28,10 @@ func readVersionFile(path string) (*orderedmap.OrderedMap, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	o := orderedmap.New()
 	err = json.Unmarshal(buf, &o)
+
 	return o, err
 }
 
@@ -37,7 +40,9 @@ func writeVersionFile(o *orderedmap.OrderedMap, path string) error {
 	if err != nil {
 		return err
 	}
+
 	err = ioutil.WriteFile(path, buf, 0644)
+
 	return err
 }
 
@@ -47,40 +52,51 @@ func init() {
 
 func doAction(c *cli.Context, action string) error {
 	if c.Bool("dry-run") {
-		fmt.Println("Start dry-run...")
+		fmt.Println("start dry-run...")
 	}
+
 	build := c.String("build")
 	if build == "" {
 		build = getfirstKeyFromOrderedMap(versionInfos)
 	}
+
 	if version, ok := versionInfos.Get(build); ok {
 		v, err := tv.Make(version.(string))
 		if err != nil {
 			return err
 		}
+
 		in := []reflect.Value{reflect.ValueOf(c.Args())}
 		result := reflect.ValueOf(v).MethodByName(action).Call(in)
+
 		if result[0].Interface() != nil {
 			return result[0].Interface().(error)
 		}
+
 		versionInfos.Set(build, v.GetVersion())
 		tag := v.GetVersion()
+
 		if !c.Bool("clear") {
 			tag = v.GetTagStr(build)
 		}
+
 		fmt.Println("Generating git tag:", tag)
+
 		if c.Bool("dry-run") {
 			return nil
 		}
+
 		err = writeVersionFile(versionInfos, tv.SemverFilePath)
 		if err != nil {
 			return err
 		}
+
 		err = tv.TagVersion(tag)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -92,6 +108,7 @@ func main() {
 		cli.StringFlag{Name: "build, b"},
 		cli.BoolFlag{Name: "clear, c"},
 		cli.BoolFlag{Name: "dry-run"},
+		cli.BoolFlag{Name: "all, a"},
 	}
 	app.Commands = []cli.Command{
 		{

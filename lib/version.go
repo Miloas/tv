@@ -20,6 +20,7 @@ func Make(vStr string) (*Version, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &Version{
 		v: &v,
 	}, nil
@@ -29,10 +30,14 @@ func (v *Version) SpecificVersion(args cli.Args) error {
 	if len(args) != 1 {
 		return errors.New("unacceptable arguments for specific version")
 	}
+
 	ver, err := semver.Make(args[0])
 	if err != nil {
-		v.v = &ver
+		return err
 	}
+
+	v.v = &ver
+
 	return err
 }
 
@@ -44,6 +49,7 @@ func (v *Version) Major(args cli.Args) error {
 
 	err = v.v.IncrementMajor()
 	v.v.Pre = nil
+
 	return err
 }
 
@@ -55,6 +61,7 @@ func (v *Version) Minor(args cli.Args) error {
 
 	err = v.v.IncrementMinor()
 	v.v.Pre = nil
+
 	return err
 }
 
@@ -66,6 +73,7 @@ func (v *Version) Patch(args cli.Args) error {
 
 	err = v.v.IncrementPatch()
 	v.v.Pre = nil
+
 	return err
 }
 
@@ -105,5 +113,6 @@ func checkArgsEmpty(args cli.Args) error {
 	if len(args) > 0 {
 		return fmt.Errorf("too many arguments")
 	}
+
 	return nil
 }

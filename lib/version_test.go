@@ -6,11 +6,11 @@ import (
 	"github.com/blang/semver"
 )
 
-func prstr(s string) semver.PRVersion {
+func prStr(s string) semver.PRVersion {
 	return semver.PRVersion{s, 0, false}
 }
 
-func prnum(i uint64) semver.PRVersion {
+func prNum(i uint64) semver.PRVersion {
 	return semver.PRVersion{"", i, true}
 }
 
@@ -23,10 +23,32 @@ func TestMake(t *testing.T) {
 		0,
 		1,
 		0,
-		[]semver.PRVersion{prstr("alpha"), prnum(1)},
+		[]semver.PRVersion{prStr("alpha"), prNum(1)},
 		[]string{"tv"},
 	}).String() {
 		t.Error("Make get a wrong Version result")
+	}
+}
+
+func TestSpecificVersion(t *testing.T) {
+	ver, _ := Make("1.2.3")
+	err := ver.SpecificVersion([]string{"2.5.0"})
+	if err != nil {
+		t.Error("Do SpecificVersion error")
+	}
+
+	if ver.v.String() != (semver.Version{
+		2,
+		5,
+		0,
+		[]semver.PRVersion{},
+		[]string{},
+	}).String() {
+		t.Error("SpecificVersion get a wrong result")
+	}
+
+	if ver.GetTagStr("tv") != "2.5.0+tv" {
+		t.Error("get wrong tag str result")
 	}
 }
 
@@ -107,7 +129,7 @@ func TestPrerelease(t *testing.T) {
 		1,
 		2,
 		3,
-		[]semver.PRVersion{prstr("alpha"), prnum(2)},
+		[]semver.PRVersion{prStr("alpha"), prNum(2)},
 		[]string{},
 	}).String() {
 		t.Error("Prerelease get a wrong result")
