@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -58,7 +59,19 @@ func doAction(c *cli.Context, action string) error {
 		if err != nil {
 			return err
 		}
-		reflect.ValueOf(v).MethodByName(action).Call([]reflect.Value{})
+		in := make([]reflect.Value, c.NArg())
+		for i := 0; i < c.NArg(); i++ {
+			in[i] = reflect.ValueOf(c.Args()[i])
+		}
+		// argument verification
+		if action == "SpecificVersion" {
+			if c.NArg() != 1 {
+				return errors.New("unacceptable arguments for specific version")
+			}
+		} else if c.NArg() > 0 {
+			return errors.New("too many arguments for " + action + " version")
+		}
+		reflect.ValueOf(v).MethodByName(action).Call(in)
 		versionInfos.Set(build, v.GetVersion())
 		tag := v.GetVersion()
 		if !c.Bool("clear") {
@@ -120,6 +133,14 @@ func main() {
 			Flags: flags,
 			Action: func(c *cli.Context) error {
 				return doAction(c, "Prerelease")
+			},
+		},
+		{
+			Name:  "version",
+			Usage: "set specific version",
+			Flags: flags,
+			Action: func(c *cli.Context) error {
+				return doAction(c, "SpecificVersion")
 			},
 		},
 	}
