@@ -86,7 +86,20 @@ Run `tv patch`, and you will get:
 }
 ```
 
-and a git tag `v0.1.1+tv`
+and a git tag `v0.1.1+tv`. `tv` is selected if you didn't pass a target to tv
+
+---
+
+Run `tv patch -t app`, and you will get:
+
+```json
+{
+  "tv": "0.1.0",
+  "app": "0.1.11"
+}
+```
+
+and a git tag `v0.1.11+app`
 
 ---
 
