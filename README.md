@@ -1,27 +1,23 @@
 # tv
-[![Build Status](https://dev.azure.com/0x9357/0x9357/_apis/build/status/Miloas.tv?branchName=master)](https://dev.azure.com/0x9357/0x9357/_build/latest?definitionId=1&branchName=master)
-
-[TOC]
+[![Build Status](https://dev.azure.com/0x9357/0x9357/_apis/build/status/Miloas.tv?branchName=master)](https://dev.azure.com/0x9357/0x9357/_build/latest?definitionId=1&branchName=master) [![GitHub release](https://img.shields.io/github/release/Miloas/tv.svg)](https://github.com/Miloas/tv/releases/)
 
 ## Installation
 
-Install tv in **macOS**
+Install tv in **macOS** through `brew`
 
 ```
 brew tap Miloas/tv
 brew install tv
 ```
 
-Install tv in **linux**
-
 ## Initialize your project
 
 create a `semver.json` file under your project folder.
 
 ```json
-// semver.json
+// [semver.json] you need to setup at least one app
 {
-  "tv": "0.1.0",    // you need to setup at least one app
+  "tv": "0.1.0",
   "app2": "0.1.1"
 }
 ```
@@ -68,3 +64,53 @@ OPTIONS:
    --all, -a                 upgrade version of all apps
    --dry-run                 do a fake action, won't create real tag
 ```
+
+## Examples
+
+For such a `semver.json` file
+
+```json
+{
+  "tv": "0.1.0",
+  "app": "0.1.10"
+}
+```
+
+---
+
+Run `tv patch`, and you will get:
+
+```json
+{
+  "tv": "0.1.1",
+  "app": "0.1.10"
+}
+```
+
+and a git tag `v0.1.1+tv`
+
+---
+
+Run `tv minor -a`, and you will get:
+
+```json
+{
+  "tv": "0.2.0",
+  "app": "0.2.0"
+}
+```
+
+and two git tags [`v0.2.0+tv`, `v0.2.0+app`]
+
+---
+
+Run `tv major -ap`, and you will get:
+
+```json
+{
+  "tv": "1.0.0",
+  "app": "1.0.0"
+}
+```
+
+and only one git tag `v1.0.0`
