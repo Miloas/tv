@@ -13,6 +13,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+var tvVersion string
 var versionInfos *orderedmap.OrderedMap
 
 func getfirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
@@ -136,6 +137,9 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tv"
 	app.Usage = "tag version for ur f** awesome project"
+	if tvVersion != "" {
+		app.Version = tvVersion
+	}
 	commandFlags := []cli.Flag{
 		cli.StringFlag{Name: "target, t", Usage: "set target app"},
 		cli.BoolFlag{Name: "pure, p", Usage: "create tag without app name"},
