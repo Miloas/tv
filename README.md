@@ -12,10 +12,9 @@ brew install tv
 
 ## Initialize your project
 
-create a `semver.json` file under your project folder.
+Create a `semver.json` file under your project folder. You need to setup at least one app.
 
 ```json
-// [semver.json] you need to setup at least one app
 {
   "tv": "0.1.0",
   "app2": "0.1.1"
@@ -51,7 +50,7 @@ GLOBAL OPTIONS:
 Options for commands:
 
 ```
-➜  tv git:(master) ./tv patch --help
+➜  tv git:(master) tv patch --help
 NAME:
    tv patch - patch version, v0.0.1 -> v0.0.2
 
