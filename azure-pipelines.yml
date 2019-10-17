@@ -51,7 +51,7 @@ jobs:
       displayName: Test
 
     - script: |
-        go build -o bin/$(bin) .
+        go build -o bin/$(bin) -ldflags "-X main.tvVersion=$(git describe --tags)" .
       workingDirectory: '$(modulePath)'
       displayName: Build Bin
 
