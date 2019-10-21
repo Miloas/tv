@@ -32,7 +32,7 @@ USAGE:
    tv [global options] command [command options] [arguments...]
 
 VERSION:
-   1.0.15
+   1.1.0
 
 COMMANDS:
    patch       patch version, v0.0.1 -> v0.0.2
