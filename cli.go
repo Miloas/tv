@@ -80,7 +80,10 @@ func doAction(c *cli.Context, action string) error {
 			return result[0].Interface().(error)
 		}
 
-		updateTags(c, v)
+		err = updateTags(c, v)
+		if err != nil {
+			return err
+		}
 	} else {
 		return fmt.Errorf("cannot find target app: %s", targetApp)
 	}
@@ -120,11 +123,10 @@ func updateTags(c *cli.Context, v *tv.Version) error {
 	}
 
 	if !c.Bool("dry-run") {
-		for _, tag := range tags {
-			err := tv.TagVersion(tag)
-			if err != nil {
-				return err
-			}
+		if len(tags) == 1 {
+			tv.TagVersion(tags[0])
+		} else {
+			tv.TagVersions(nextVer, tags)
 		}
 	}
 
