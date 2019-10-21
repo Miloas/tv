@@ -26,6 +26,20 @@ func Make(vStr string) (*Version, error) {
 	}, nil
 }
 
+func Compare(vStr1 string, vStr2 string) (int, error) {
+	v1, err := semver.Make(vStr1)
+	if err != nil {
+		return 0, err
+	}
+
+	v2, err := semver.Make(vStr2)
+	if err != nil {
+		return 0, err
+	}
+
+	return v1.Compare(v2), nil
+}
+
 func (v *Version) SpecificVersion(args cli.Args) error {
 	if len(args) != 1 {
 		return errors.New("unacceptable arguments for specific version")

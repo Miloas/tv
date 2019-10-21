@@ -56,6 +56,18 @@ func getTargetApp(c *cli.Context) string {
 	if targetApp == "" {
 		targetApp = getfirstKeyFromOrderedMap(versionInfos)
 	}
+	// if `--all` is set, choose the highest version
+	if c.Bool("all") {
+		currentVersion := "0.0.0"
+		for _, k := range versionInfos.Keys() {
+			version, _ := versionInfos.Get(k)
+			result, _ := tv.Compare(version.(string), currentVersion)
+			if result == 1 {
+				currentVersion = version.(string)
+				targetApp = k
+			}
+		}
+	}
 
 	return targetApp
 }
