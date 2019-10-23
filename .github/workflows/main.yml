@@ -1,4 +1,4 @@
-name: 呱呱呱
+name: build
 on: [pull_request]
 jobs:
   lint:
