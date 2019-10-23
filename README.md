@@ -1,4 +1,5 @@
 # tv
+[![Build Status](https://github.com/Miloas/tv/workflows/build/badge.svg)](https://github.com/Miloas/tv/workflows/build/badge.svg)
 [![GitHub release](https://img.shields.io/github/release/Miloas/tv.svg)](https://github.com/Miloas/tv/releases/)
 
 ## Installation
