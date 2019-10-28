@@ -8,13 +8,17 @@ import (
 	"github.com/urfave/cli"
 )
 
+// SemverFileName : store version info
 const SemverFileName = "semver.json"
+// SemverFilePath : path of SemverFile
 const SemverFilePath = "./" + SemverFileName
 
+// Version : struct to store semver.Version
 type Version struct {
 	v *semver.Version
 }
 
+// Make : create Version from version string
 func Make(vStr string) (*Version, error) {
 	v, err := semver.Make(vStr)
 	if err != nil {
@@ -26,6 +30,7 @@ func Make(vStr string) (*Version, error) {
 	}, nil
 }
 
+// Compare : using to compare two version string
 func Compare(vStr1 string, vStr2 string) (int, error) {
 	v1, err := semver.Make(vStr1)
 	if err != nil {
@@ -40,6 +45,7 @@ func Compare(vStr1 string, vStr2 string) (int, error) {
 	return v1.Compare(v2), nil
 }
 
+// SpecificVersion : tag specific version
 func (v *Version) SpecificVersion(args cli.Args) error {
 	if len(args) != 1 {
 		return errors.New("unacceptable arguments for specific version")
@@ -55,6 +61,7 @@ func (v *Version) SpecificVersion(args cli.Args) error {
 	return err
 }
 
+// Major : increment Major version
 func (v *Version) Major(args cli.Args) error {
 	err := checkArgsEmpty(args)
 	if err != nil {
@@ -67,6 +74,7 @@ func (v *Version) Major(args cli.Args) error {
 	return err
 }
 
+// Minor : increment Minor version
 func (v *Version) Minor(args cli.Args) error {
 	err := checkArgsEmpty(args)
 	if err != nil {
@@ -79,6 +87,7 @@ func (v *Version) Minor(args cli.Args) error {
 	return err
 }
 
+// Patch : using to increment Patch version
 func (v *Version) Patch(args cli.Args) error {
 	err := checkArgsEmpty(args)
 	if err != nil {
@@ -91,6 +100,7 @@ func (v *Version) Patch(args cli.Args) error {
 	return err
 }
 
+// Prerelease : using to increment Prerelease version
 func (v *Version) Prerelease(args cli.Args) error {
 	err := checkArgsEmpty(args)
 	if err != nil {
@@ -98,7 +108,7 @@ func (v *Version) Prerelease(args cli.Args) error {
 	}
 
 	preVersions := v.v.Pre
-	err = fmt.Errorf("Prerelease version can not be incremented for %q", v.v.String())
+	err = fmt.Errorf("prerelease version can not be incremented for %q", v.v.String())
 
 	if len(preVersions) != 2 {
 		return err
@@ -114,12 +124,14 @@ func (v *Version) Prerelease(args cli.Args) error {
 	return nil
 }
 
+// GetTagStr : get tag str with build info
 func (v *Version) GetTagStr(build string) string {
 	v.v.Build = []string{build}
 	return v.v.String()
 }
 
-func (v *Version) GetVersion() string {
+// String : Version -> string
+func (v *Version) String() string {
 	return v.v.String()
 }
 

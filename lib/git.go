@@ -5,14 +5,6 @@ import (
 	"strconv"
 )
 
-func IsClean() bool {
-	out, err := exec.Command("git", "status", "--untracked", "--short").Output()
-	if err != nil {
-		panic(err)
-	}
-	return string(out) == ""
-}
-
 func commitChanges(version string) (string, error) {
 	commitMessage, _ := strconv.Unquote("\"" + version + "\"")
 	err := exec.Command("git", "add", SemverFileName).Run()
@@ -26,6 +18,7 @@ func commitChanges(version string) (string, error) {
 	return commitMessage, nil
 }
 
+// TagVersion : git tag -am "xxx" 1.1.1
 func TagVersion(tag string) error {
 	commitMessage, err := commitChanges(tag)
 	if err != nil {
@@ -34,6 +27,7 @@ func TagVersion(tag string) error {
 	return exec.Command("git", "tag", "-am", commitMessage, tag).Run()
 }
 
+// TagVersions : TagVersion for all tags
 func TagVersions(version string, tags []string) error {
 	commitMessage, err := commitChanges(version)
 	if err != nil {
