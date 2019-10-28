@@ -16,7 +16,7 @@ import (
 var version string
 var versionInfos *orderedmap.OrderedMap
 
-func getfirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
+func getFirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
 	for _, k := range o.Keys() {
 		return k
 	}
@@ -54,7 +54,7 @@ func init() {
 func getTargetApp(c *cli.Context) string {
 	targetApp := c.String("target")
 	if targetApp == "" {
-		targetApp = getfirstKeyFromOrderedMap(versionInfos)
+		targetApp = getFirstKeyFromOrderedMap(versionInfos)
 	}
 	// if `--all` is set, choose the highest version
 	if c.Bool("all") {
@@ -105,8 +105,8 @@ func doAction(c *cli.Context, action string) error {
 
 func updateTags(c *cli.Context, v *tv.Version) error {
 	targetApp := getTargetApp(c)
-	nextVer := v.GetVersion()
-	appsToUpdate := []string{}
+	nextVer := v.String()
+	var appsToUpdate []string
 
 	if !c.Bool("all") {
 		appsToUpdate = append(appsToUpdate, targetApp)
@@ -125,7 +125,7 @@ func updateTags(c *cli.Context, v *tv.Version) error {
 		}
 	}
 
-	tags := []string{}
+	var tags []string
 	if c.Bool("pure") {
 		tags = append(tags, nextVer)
 	} else {
@@ -136,9 +136,9 @@ func updateTags(c *cli.Context, v *tv.Version) error {
 
 	if !c.Bool("dry-run") {
 		if len(tags) == 1 {
-			tv.TagVersion(tags[0])
+			_ = tv.TagVersion(tags[0])
 		} else {
-			tv.TagVersions(nextVer, tags)
+			_ = tv.TagVersions(nextVer, tags)
 		}
 	}
 
