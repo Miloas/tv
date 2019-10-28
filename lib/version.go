@@ -10,6 +10,7 @@ import (
 
 // SemverFileName : store version info
 const SemverFileName = "semver.json"
+
 // SemverFilePath : path of SemverFile
 const SemverFilePath = "./" + SemverFileName
 
