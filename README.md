@@ -1,6 +1,7 @@
 # tv
 [![Build Status](https://github.com/Miloas/tv/workflows/build/badge.svg)](https://github.com/Miloas/tv/workflows/build/badge.svg)
 [![GitHub release](https://img.shields.io/github/release/Miloas/tv.svg)](https://github.com/Miloas/tv/releases/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Miloas/tv)](https://goreportcard.com/report/github.com/Miloas/tv)
 
 ## Installation
 
