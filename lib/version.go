@@ -138,7 +138,7 @@ func (v *Version) String() string {
 
 func checkArgsEmpty(args cli.Args) error {
 	if len(args) > 0 {
-		return fmt.Errorf("too many arguments")
+		return errors.New("too many arguments")
 	}
 
 	return nil

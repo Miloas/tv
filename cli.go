@@ -1,16 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
+	"errors"
 	"reflect"
 	tv "tv/lib"
 
-	"github.com/iancoleman/orderedmap"
 	"github.com/urfave/cli"
+	"github.com/iancoleman/orderedmap"
 )
 
 var version string
@@ -24,31 +23,8 @@ func getFirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
 	return ""
 }
 
-func readVersionFile(path string) (*orderedmap.OrderedMap, error) {
-	buf, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	o := orderedmap.New()
-	err = json.Unmarshal(buf, &o)
-
-	return o, err
-}
-
-func writeVersionFile(o *orderedmap.OrderedMap, path string) error {
-	buf, err := json.MarshalIndent(&o, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(path, buf, 0644)
-
-	return err
-}
-
 func init() {
-	versionInfos, _ = readVersionFile(tv.SemverFilePath)
+	versionInfos, _ = tv.ReadVersionFile(tv.SemverFilePath)
 }
 
 func getTargetApp(c *cli.Context) string {
@@ -119,7 +95,7 @@ func updateTags(c *cli.Context, v *tv.Version) error {
 	}
 
 	if !c.Bool("dry-run") {
-		err := writeVersionFile(versionInfos, tv.SemverFilePath)
+		err := tv.WriteVersionFile(versionInfos, tv.SemverFilePath)
 		if err != nil {
 			return err
 		}
@@ -161,6 +137,25 @@ func main() {
 		cli.BoolFlag{Name: "dry-run", Usage: "do a fake action, won't create real tag"},
 	}
 	app.Commands = []cli.Command{
+		{
+			Name: "init",
+			Usage: "init tv for ur project",
+			Action: func(c *cli.Context) error {
+				args := c.Args()
+				if len(args) == 0 {
+					return errors.New("init need at least one module name")
+				}
+				if tv.IsFileExist(tv.SemverFilePath) {
+					return errors.New("semver.json is exist")
+				}
+				o := orderedmap.New()
+				for _, moduleName := range(args) {
+					o.Set(moduleName, "0.0.0")
+				}
+				tv.WriteVersionFile(o, tv.SemverFilePath)
+				return nil
+			},
+		},
 		{
 			Name:  "patch",
 			Usage: "patch version, v0.0.1 -> v0.0.2",
