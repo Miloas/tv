@@ -14,12 +14,12 @@ brew install tv
 
 ## Initialize your project
 
-Create a `semver.json` file under your project folder. You need to setup at least one app.
+Create a `semver.json` file using `tv init app app2` under your project folder. You need to setup at least one app.
 
 ```json
 {
-  "tv": "0.1.0",
-  "app2": "0.1.1"
+  "app": "0.0.0",
+  "app2": "0.0.0"
 }
 ```
 
