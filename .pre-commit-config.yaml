@@ -1,0 +1,6 @@
+- repo: https://github.com/Miloas/pre-commit-golang
+  sha: HEAD
+  hooks:
+    - id: go-fmt
+    - id: revive
+    - id: go-unit-tests
