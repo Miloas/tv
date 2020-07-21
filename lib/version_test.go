@@ -161,3 +161,31 @@ func TestRelease(t *testing.T) {
 		t.Error("get wrong tag str result")
 	}
 }
+
+func TestRreminor(t *testing.T) {
+	ver, _ := Make("1.2.3")
+	err := ver.Preminor([]string{})
+	if err != nil {
+		t.Error("Do Prerelease error")
+	}
+
+	if ver.v.String() != (semver.Version{
+		Major: 1,
+		Minor: 3,
+		Patch: 0,
+		Pre: []semver.PRVersion{{
+			VersionStr: "alpha",
+			IsNum:      false,
+		}, {
+			VersionNum: 0,
+			IsNum:      true,
+		}},
+		Build: []string{},
+	}).String() {
+		t.Error("Preminor get a wrong result")
+	}
+
+	if ver.GetTagStr("tv") != "1.3.0-alpha.0+tv" {
+		t.Error("get wrong tag str result")
+	}
+}

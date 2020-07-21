@@ -197,6 +197,14 @@ func main() {
 			},
 		},
 		{
+			Name:  "preminor",
+			Usage: "preminor version, v0.0.1 -> v0.1.0-alpha.0",
+			Flags: commandFlags,
+			Action: func(c *cli.Context) error {
+				return doAction(c, "Preminor")
+			},
+		},
+		{
 			Name:  "version",
 			Usage: "set specific version",
 			Flags: commandFlags,
