@@ -217,3 +217,31 @@ func TestRreminor(t *testing.T) {
 		t.Error("get wrong tag str result")
 	}
 }
+
+func TestRremajor(t *testing.T) {
+	ver, _ := Make("1.2.3")
+	err := ver.Premajor([]string{})
+	if err != nil {
+		t.Error("Do Prerelease error")
+	}
+
+	if ver.v.String() != (semver.Version{
+		Major: 2,
+		Minor: 0,
+		Patch: 0,
+		Pre: []semver.PRVersion{{
+			VersionStr: "alpha",
+			IsNum:      false,
+		}, {
+			VersionNum: 0,
+			IsNum:      true,
+		}},
+		Build: []string{},
+	}).String() {
+		t.Error("Premajor get a wrong result")
+	}
+
+	if ver.GetTagStr("tv") != "2.0.0-alpha.0+tv" {
+		t.Error("get wrong tag str result")
+	}
+}

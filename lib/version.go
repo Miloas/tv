@@ -185,6 +185,30 @@ func (v *Version) Preminor(args cli.Args) error {
 	return nil
 }
 
+// Premajor: using to increment Premajor version
+func (v *Version) Premajor(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
+	preVersions := v.v.Pre
+	if len(preVersions) != 0 {
+		return fmt.Errorf("Premajor version can not be applied for a prerelease version %q", v.v.String())
+	}
+	v.v.Major += 1
+	v.v.Minor = 0
+	v.v.Patch = 0
+	v.v.Pre = []semver.PRVersion{{
+		VersionStr: "alpha",
+		IsNum:      false,
+	}, {
+		VersionNum: 0,
+		IsNum:      true,
+	}}
+	return nil
+}
+
 // GetTagStr : get tag str with build info
 func (v *Version) GetTagStr(build string) string {
 	v.v.Build = []string{build}
