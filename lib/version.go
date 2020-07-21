@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Miloas/semver"
+	"github.com/blang/semver/v4"
 	"github.com/urfave/cli"
 )
 

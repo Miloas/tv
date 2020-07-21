@@ -3,7 +3,7 @@ package tv
 import (
 	"testing"
 
-	"github.com/Miloas/semver"
+	"github.com/blang/semver/v4"
 )
 
 func prStr(s string) semver.PRVersion {
