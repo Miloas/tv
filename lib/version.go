@@ -140,6 +140,28 @@ func (v *Version) Prerelease(args cli.Args) error {
 	return nil
 }
 
+// Prepatch: using to increment Prepatch version
+func (v *Version) Prepatch(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
+	preVersions := v.v.Pre
+	if len(preVersions) != 0 {
+		return fmt.Errorf("Prepatch version can not be applied for a prerelease version %q", v.v.String())
+	}
+	v.v.Patch += 1
+	v.v.Pre = []semver.PRVersion{{
+		VersionStr: "alpha",
+		IsNum:      false,
+	}, {
+		VersionNum: 0,
+		IsNum:      true,
+	}}
+	return nil
+}
+
 // Preminor: using to increment Preminor version
 func (v *Version) Preminor(args cli.Args) error {
 	err := checkArgsEmpty(args)
