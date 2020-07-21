@@ -139,3 +139,25 @@ func TestPrerelease(t *testing.T) {
 		t.Error("get wrong tag str result")
 	}
 }
+
+func TestRelease(t *testing.T) {
+	ver, _ := Make("1.2.3-alpha.1")
+	err := ver.Release([]string{})
+	if err != nil {
+		t.Error("Do Prerelease error")
+	}
+
+	if ver.v.String() != (semver.Version{
+		Major: 1,
+		Minor: 2,
+		Patch: 3,
+		Pre:   []semver.PRVersion{},
+		Build: []string{},
+	}).String() {
+		t.Error("Release get a wrong result")
+	}
+
+	if ver.GetTagStr("tv") != "1.2.3+tv" {
+		t.Error("get wrong tag str result")
+	}
+}

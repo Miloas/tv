@@ -101,6 +101,21 @@ func (v *Version) Patch(args cli.Args) error {
 	return err
 }
 
+// Release : Release version
+func (v *Version) Release(args cli.Args) error {
+	err := checkArgsEmpty(args)
+	if err != nil {
+		return err
+	}
+
+	preVersions := v.v.Pre
+	if len(preVersions) != 2 {
+		return fmt.Errorf("%q is not a prerelease version", v.v.String())
+	}
+	v.v.Pre = nil
+	return nil
+}
+
 // Prerelease : using to increment Prerelease version
 func (v *Version) Prerelease(args cli.Args) error {
 	err := checkArgsEmpty(args)

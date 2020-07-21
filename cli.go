@@ -1,15 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
-	"errors"
 	"reflect"
 	tv "tv/lib"
 
-	"github.com/urfave/cli"
 	"github.com/iancoleman/orderedmap"
+	"github.com/urfave/cli"
 )
 
 var version string
@@ -138,7 +138,7 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		{
-			Name: "init",
+			Name:  "init",
 			Usage: "init tv for ur project",
 			Action: func(c *cli.Context) error {
 				args := c.Args()
@@ -149,7 +149,7 @@ func main() {
 					return errors.New("semver.json is exist")
 				}
 				o := orderedmap.New()
-				for _, moduleName := range(args) {
+				for _, moduleName := range args {
 					o.Set(moduleName, "0.0.0")
 				}
 				tv.WriteVersionFile(o, tv.SemverFilePath)
@@ -186,6 +186,14 @@ func main() {
 			Flags: commandFlags,
 			Action: func(c *cli.Context) error {
 				return doAction(c, "Prerelease")
+			},
+		},
+		{
+			Name:  "release",
+			Usage: "release version, v0.0.1-alpha.1 -> v0.0.1",
+			Flags: commandFlags,
+			Action: func(c *cli.Context) error {
+				return doAction(c, "Release")
 			},
 		},
 		{
