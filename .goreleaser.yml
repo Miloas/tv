@@ -21,7 +21,7 @@ archives:
       linux: Linux
       amd64: x86_64
 brews:
-  - github:
+  - tap:
       owner: Miloas
       name: homebrew-tv
     folder: Formula
