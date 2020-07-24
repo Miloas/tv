@@ -34,13 +34,18 @@ USAGE:
    tv [global options] command [command options] [arguments...]
 
 VERSION:
-   1.1.0
+   1.3.1
 
 COMMANDS:
+   init        init tv for ur project
    patch       patch version, v0.0.1 -> v0.0.2
    major       major version, v0.0.1 -> v1.0.1
    minor       minor version, v0.0.1 -> v0.1.1
    prerelease  prerelease version, v0.0.1-alpha.1 -> v0.0.1-alpha.2
+   release     release version, v0.0.1-alpha.1 -> v0.0.1
+   prepatch    prepatch version, v0.0.1 -> v0.0.2-alpha.0
+   preminor    preminor version, v0.0.1 -> v0.1.0-alpha.0
+   premajor    preminor version, v0.0.1 -> v1.0.0-alpha.0
    version     set specific version
    help, h     Shows a list of commands or help for one command
 
