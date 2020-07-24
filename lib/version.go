@@ -151,7 +151,10 @@ func (v *Version) Prepatch(args cli.Args) error {
 	if len(preVersions) != 0 {
 		return fmt.Errorf("Prepatch version can not be applied for a prerelease version %q", v.v.String())
 	}
-	v.v.Patch += 1
+	err = v.v.IncrementPatch()
+	if err != nil {
+		return err
+	}
 	v.v.Pre = []semver.PRVersion{{
 		VersionStr: "alpha",
 		IsNum:      false,
@@ -173,8 +176,10 @@ func (v *Version) Preminor(args cli.Args) error {
 	if len(preVersions) != 0 {
 		return fmt.Errorf("Preminor version can not be applied for a prerelease version %q", v.v.String())
 	}
-	v.v.Minor += 1
-	v.v.Patch = 0
+	err = v.v.IncrementMinor()
+	if err != nil {
+		return err
+	}
 	v.v.Pre = []semver.PRVersion{{
 		VersionStr: "alpha",
 		IsNum:      false,
@@ -196,9 +201,10 @@ func (v *Version) Premajor(args cli.Args) error {
 	if len(preVersions) != 0 {
 		return fmt.Errorf("Premajor version can not be applied for a prerelease version %q", v.v.String())
 	}
-	v.v.Major += 1
-	v.v.Minor = 0
-	v.v.Patch = 0
+	err = v.v.IncrementMajor()
+	if err != nil {
+		return err
+	}
 	v.v.Pre = []semver.PRVersion{{
 		VersionStr: "alpha",
 		IsNum:      false,
