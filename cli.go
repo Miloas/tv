@@ -154,10 +154,12 @@ func main() {
 				if len(args) == 0 {
 					return errors.New("init need at least one module name")
 				}
+				var o *orderedmap.OrderedMap
 				if tv.IsFileExist(tv.SemverFilePath) {
-					return errors.New("semver.json is exist")
+					o = versionInfos
+				} else {
+					o = orderedmap.New()
 				}
-				o := orderedmap.New()
 				for _, moduleName := range args {
 					o.Set(moduleName, "0.0.0")
 				}
