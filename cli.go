@@ -8,20 +8,13 @@ import (
 	"reflect"
 	tv "tv/lib"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/iancoleman/orderedmap"
 	"github.com/urfave/cli"
 )
 
 var version string
 var versionInfos *orderedmap.OrderedMap
-
-func getFirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
-	for _, k := range o.Keys() {
-		return k
-	}
-
-	return ""
-}
 
 func init() {
 	versionInfos, _ = tv.ReadVersionFile(tv.SemverFilePath)
@@ -31,6 +24,31 @@ func init() {
 func getTargetApps(c *cli.Context) []string {
 	if !c.Bool("all") {
 		targetApp := c.String("target")
+		if targetApp == "" {
+			// user does not input target app. try to be clever:
+			// 1. if there is only one app in semver.json, then we simply choose it for the user.
+			// 2. if multiple apps, then launch a select panel for the user to choose the app he/she wants to tag.
+			if len(versionInfos.Keys()) == 1 {
+				targetApp = versionInfos.Keys()[0]
+			} else {
+				question := []*survey.Question{
+					{
+						Name: "app",
+						Prompt: &survey.Select{
+							Message: "choose an app you want to tag:",
+							Options: versionInfos.Keys(),
+						},
+					},
+				}
+
+				answer := struct {
+					App string
+				}{}
+
+				_ = survey.Ask(question, &answer)
+				targetApp = answer.App
+			}
+		}
 		return []string{targetApp}
 	} else {
 		return versionInfos.Keys()
