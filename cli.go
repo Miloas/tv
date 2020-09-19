@@ -8,6 +8,7 @@ import (
 	"reflect"
 	tv "tv/lib"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/iancoleman/orderedmap"
 	"github.com/urfave/cli"
 )
@@ -15,37 +16,43 @@ import (
 var version string
 var versionInfos *orderedmap.OrderedMap
 
-func getFirstKeyFromOrderedMap(o *orderedmap.OrderedMap) string {
-	for _, k := range o.Keys() {
-		return k
-	}
-
-	return ""
-}
-
 func init() {
 	versionInfos, _ = tv.ReadVersionFile(tv.SemverFilePath)
 }
 
-func getTargetApp(c *cli.Context) string {
-	targetApp := c.String("target")
-	if targetApp == "" {
-		targetApp = getFirstKeyFromOrderedMap(versionInfos)
-	}
-	// if `--all` is set, choose the highest version
-	if c.Bool("all") {
-		currentVersion := "0.0.0"
-		for _, k := range versionInfos.Keys() {
-			version, _ := versionInfos.Get(k)
-			result, _ := tv.Compare(version.(string), currentVersion)
-			if result == 1 {
-				currentVersion = version.(string)
-				targetApp = k
+// parse the cli arguments and return a list of apps that should be updated.
+func getTargetApps(c *cli.Context) []string {
+	if !c.Bool("all") {
+		targetApp := c.String("target")
+		if targetApp == "" {
+			// user does not input target app. try to be clever:
+			// 1. if there is only one app in semver.json, then we simply choose it for the user.
+			// 2. if multiple apps, then launch a select panel for the user to choose the app he/she wants to tag.
+			if len(versionInfos.Keys()) == 1 {
+				targetApp = versionInfos.Keys()[0]
+			} else {
+				question := []*survey.Question{
+					{
+						Name: "app",
+						Prompt: &survey.Select{
+							Message: "choose an app you want to tag:",
+							Options: versionInfos.Keys(),
+						},
+					},
+				}
+
+				answer := struct {
+					App string
+				}{}
+
+				_ = survey.Ask(question, &answer)
+				targetApp = answer.App
 			}
 		}
+		return []string{targetApp}
+	} else {
+		return versionInfos.Keys()
 	}
-
-	return targetApp
 }
 
 func doAction(c *cli.Context, action string) error {
@@ -53,42 +60,44 @@ func doAction(c *cli.Context, action string) error {
 		fmt.Println("start dry-run...")
 	}
 
-	targetApp := getTargetApp(c)
+	appsToUpdate := getTargetApps(c)
 
-	if version, ok := versionInfos.Get(targetApp); ok {
-		v, err := tv.Make(version.(string))
-		if err != nil {
-			return err
+	highestVersion := "0.0.0"
+
+	// find the highest version of these apps.
+	for _, app := range appsToUpdate {
+		if version, ok := versionInfos.Get(app); ok {
+			result, _ := tv.Compare(version.(string), highestVersion)
+			if result == 1 {
+				highestVersion = version.(string)
+			}
+		} else {
+			return fmt.Errorf("cannot find target app: %s", app)
 		}
+	}
 
-		in := []reflect.Value{reflect.ValueOf(c.Args())}
-		result := reflect.ValueOf(v).MethodByName(action).Call(in)
+	v, err := tv.Make(highestVersion)
+	if err != nil {
+		return err
+	}
 
-		if result[0].Interface() != nil {
-			return result[0].Interface().(error)
-		}
+	in := []reflect.Value{reflect.ValueOf(c.Args())}
+	result := reflect.ValueOf(v).MethodByName(action).Call(in)
 
-		err = updateTags(c, v)
-		if err != nil {
-			return err
-		}
-	} else {
-		return fmt.Errorf("cannot find target app: %s", targetApp)
+	if result[0].Interface() != nil {
+		return result[0].Interface().(error)
+	}
+
+	err = updateTags(c, v, appsToUpdate)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func updateTags(c *cli.Context, v *tv.Version) error {
-	targetApp := getTargetApp(c)
+func updateTags(c *cli.Context, v *tv.Version, appsToUpdate []string) error {
 	nextVer := v.String()
-	var appsToUpdate []string
-
-	if !c.Bool("all") {
-		appsToUpdate = append(appsToUpdate, targetApp)
-	} else {
-		appsToUpdate = append(appsToUpdate, versionInfos.Keys()...)
-	}
 
 	for _, app := range appsToUpdate {
 		versionInfos.Set(app, nextVer)
@@ -145,10 +154,12 @@ func main() {
 				if len(args) == 0 {
 					return errors.New("init need at least one module name")
 				}
+				var o *orderedmap.OrderedMap
 				if tv.IsFileExist(tv.SemverFilePath) {
-					return errors.New("semver.json is exist")
+					o = versionInfos
+				} else {
+					o = orderedmap.New()
 				}
-				o := orderedmap.New()
 				for _, moduleName := range args {
 					o.Set(moduleName, "0.0.0")
 				}
