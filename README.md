@@ -5,7 +5,7 @@
 
 ## Installation
 
-Install tv in **macOS** through `brew`
+Install tv in **macOS / Linux** through `brew`
 
 ```
 brew tap Miloas/tv
