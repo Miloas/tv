@@ -97,6 +97,11 @@ func doAction(c *cli.Context, action string) error {
 }
 
 func updateTags(c *cli.Context, v *tv.Version, appsToUpdate []string) error {
+	preid := c.String("preid")
+	if preid != "" {
+		v.UpdatePreid(preid)
+	}
+
 	nextVer := v.String()
 
 	for _, app := range appsToUpdate {
@@ -141,6 +146,7 @@ func main() {
 	}
 	commandFlags := []cli.Flag{
 		cli.StringFlag{Name: "target, t", Usage: "set target app"},
+		cli.StringFlag{Name: "preid", Usage: "prerelease identifier, like the rc in 1.2.0-rc.8."},
 		cli.BoolFlag{Name: "pure, p", Usage: "create tag without app name"},
 		cli.BoolFlag{Name: "all, a", Usage: "upgrade version of all apps"},
 		cli.BoolFlag{Name: "dry-run", Usage: "do a fake action, won't create real tag"},
