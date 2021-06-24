@@ -46,6 +46,15 @@ func Compare(vStr1 string, vStr2 string) (int, error) {
 	return v1.Compare(v2), nil
 }
 
+// UpdatePreid: update preid if it exists
+func (v *Version) UpdatePreid(preid string) error {
+	preVersions := v.v.Pre
+	if len(preVersions) == 2 && !preVersions[0].IsNum && preVersions[1].IsNum {
+		v.v.Pre[0].VersionStr = preid
+	}
+	return nil
+}
+
 // SpecificVersion : tag specific version
 func (v *Version) SpecificVersion(args cli.Args) error {
 	if len(args) != 1 {
@@ -130,7 +139,7 @@ func (v *Version) Prerelease(args cli.Args) error {
 		return err
 	}
 
-	if preVersions[0].VersionStr != "alpha" && preVersions[0].VersionStr != "beta" || !preVersions[1].IsNum {
+	if preVersions[0].IsNum || !preVersions[1].IsNum {
 		return err
 	}
 
