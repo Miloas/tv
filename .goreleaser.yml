@@ -12,13 +12,12 @@ builds:
     - darwin
   goarch:
     - amd64
+    - arm64
 checksum:
   name_template: '{{ .ProjectName }}_checksums.txt'
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
-      darwin: Darwin
-      linux: Linux
       amd64: x86_64
 brews:
   - tap:
@@ -26,6 +25,6 @@ brews:
       name: homebrew-tv
     folder: Formula
     homepage:  https://github.com/Miloas/tv
-    description: tag version cli
+    description: Tag version cli
     test: |
-      system "#{bin}/tv help"
+      system "#{bin}/tv", "help"
