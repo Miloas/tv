@@ -34,7 +34,7 @@ USAGE:
    tv [global options] command [command options] [arguments...]
 
 VERSION:
-   1.3.1
+   1.3.8
 
 COMMANDS:
    init        init tv for ur project
