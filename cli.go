@@ -183,7 +183,7 @@ func main() {
 		},
 		{
 			Name:  "major",
-			Usage: "major version, v0.0.1 -> v1.0.1",
+			Usage: "major version, v0.0.1 -> v1.0.0",
 			Flags: commandFlags,
 			Action: func(c *cli.Context) error {
 				return doAction(c, "Major")
@@ -191,7 +191,7 @@ func main() {
 		},
 		{
 			Name:  "minor",
-			Usage: "minor version, v0.0.1 -> v0.1.1",
+			Usage: "minor version, v0.0.1 -> v0.1.0",
 			Flags: commandFlags,
 			Action: func(c *cli.Context) error {
 				return doAction(c, "Minor")
