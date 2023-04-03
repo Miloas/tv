@@ -1,6 +1,6 @@
 module tv
 
-go 1.19
+go 1.20
 
 replace github.com/Miloas/tv/lib => ./lib
 
