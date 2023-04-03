@@ -1,4 +1,6 @@
+repos:
 - repo: https://github.com/Miloas/pre-commit-golang
+  rev: 3c333a08766e844c96539753ba03fbba321e5a21
   sha: HEAD
   hooks:
     - id: go-fmt
