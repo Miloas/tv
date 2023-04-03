@@ -3,22 +3,16 @@ on: [pull_request]
 jobs:
   lint:
     name: Lint
-    strategy:
-      matrix:
-        platform: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.19.x
-      - name: Check out code
-        uses: actions/checkout@v1
-      - name: Lint Go Code
-        run: |
-          go get -u github.com/mgechev/revive
-          export PATH=$PATH:$(go env GOPATH)/bin # temporary fix. See https://github.com/actions/setup-go/issues/14
-          revive -config defaults.toml --formatter friendly ./...
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Run Revive Action
+      uses: morphy2k/revive-action@v2
+      with:
+        path: defaults.toml
 
   test:
     name: Test
